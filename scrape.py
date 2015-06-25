@@ -1,7 +1,15 @@
 from mechanize import Browser
 from BeautifulSoup import BeautifulSoup
+from pprint import pprint
+import string, sys
 
-def make_request(letter):
+def clean(text):
+    for char in string.whitespace + string.punctuation:
+        text = text.replace(char, "")
+
+    return text
+
+def make_request(letter, people):
     browser = Browser()
     browser.open("https://directory.andrew.cmu.edu/")
 
@@ -15,22 +23,31 @@ def make_request(letter):
 
     page = open("response.html", "r").read()
     soup = BeautifulSoup(page)
-    
+
     table = soup.findAll('tr')
     for row in table[1:]:
-
         info = row.findAll('td')
-        first = info[0].contents[1].contents
-        last = info[1].contents[1].contents
-        andrew = info[2].contents[1].contents
-        affiliation = info[3].contents
-        department = info[4].contents
+        data = {}
 
-        print first, last, andrew, affiliation, department
-        print "==================="
+        data["first"] = clean(info[0].contents[1].contents[0])
+        data["last"] = clean(info[1].contents[1].contents[0])
+        data["affiliation"] = clean(info[3].contents[0])
+        data["department"] = clean(info[4].contents[0])
+
+        andrew = info[2].contents[1].contents[0]
+        people[andrew] = data
 
 def main():
-    make_request("a")
+    people = {}
+    for char in string.ascii_lowercase:
+        make_request(char, people)
+
+    #     sys.stdout.flush()
+    #     sys.stdout.write("\rfinished %s... " % char)
+
+    # print "done!"
+
+    pprint(people)
 
 if __name__ == "__main__":
     main()
