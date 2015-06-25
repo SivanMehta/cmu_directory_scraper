@@ -2,16 +2,24 @@ from mechanize import Browser
 from BeautifulSoup import BeautifulSoup
 
 def make_request(letter):
-    br = Browser()
-    br.open("https://directory.andrew.cmu.edu/")
+    browser = Browser()
+    browser.open("https://directory.andrew.cmu.edu/")
 
-    br.select_form(nr=0)
+    browser.select_form(nr=0)
 
-    br.form['search[generic_search_terms]'] = letter
-    br.submit()
-    with open(".reponse.html", "w") as f:
-        f.write(br.response().read())
+    browser.form['search[generic_search_terms]'] = letter
+    browser.submit()
+    with open("response.html", "w") as f:
+        f.write(browser.response().read())
+        f.close()
 
+    page = open("response.html", "r").read()
+    soup = BeautifulSoup(page)
+    # print soup
+    table = soup.findAll('td')
+    for row in table:
+        print row, "\n"
+        
 def main():
     make_request("a")
 
