@@ -1,14 +1,19 @@
-import mechanize
+from mechanize import Browser
+from BeautifulSoup import BeautifulSoup
 
-def main():
-    br = mechanize.Browser()
+def make_request(letter):
+    br = Browser()
     br.open("https://directory.andrew.cmu.edu/")
 
     br.select_form(nr=0)
 
-    br.form['search[generic_search_terms]'] = "a"
+    br.form['search[generic_search_terms]'] = letter
     br.submit()
-    print br.response().read()
+    with open(".reponse.html", "w") as f:
+        f.write(br.response().read())
+
+def main():
+    make_request("a")
 
 if __name__ == "__main__":
     main()
